@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Productos en Tiempo Real</title>
+</head>
+<body>
+  <h1>Lista de Productos en Tiempo Real</h1>
+  <ul id="productsList">
+    {{#each products}}
+      <li>{{this}}</li>
+    {{/each}}
+  </ul>
+
+  <h2>Agregar Producto</h2>
+  <input type="text" id="productInput" placeholder="Nuevo producto" />
+  <button id="addProduct">Agregar</button>
+
+  <h2>Eliminar Producto</h2>
+  <input type="number" id="productIndex" placeholder="Índice del producto a eliminar" />
+  <button id="deleteProduct">Eliminar</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    // Actualizar la lista de productos en tiempo real
+    socket.on('updateProducts', (products) => {
+      const productsList = document.getElementById('productsList');
+      productsList.innerHTML = ''; // Limpiar lista
+      products.forEach((product, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${index + 1}. ${product}`;
+        productsList.appendChild(li);
+      });
+    });
+
+    // Agregar producto
+    document.getElementById('addProduct').addEventListener('click', () => {
+      const product = document.getElementById('productInput').value;
+      if (product) {
+        socket.emit('newProduct', product); // Emitir el nuevo producto
+      }
+    });
+
+    // Eliminar producto
+    document.getElementById('deleteProduct').addEventListener('click', () => {
+      const index = parseInt(document.getElementById('productIndex').value) - 1;
+      if (index >= 0) {
+        socket.emit('deleteProduct', index); // Emitir el índice del producto a eliminar
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/index.js"></script>
